@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>特約商店資訊</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1 id="shop-title">特約商店資訊</h1>
+      <p>自動從 PDF 解析，依最新 GitHub Pages 版本呈現。</p>
+    </header>
+    <main>
+      <div id="status" class="status">正在載入資料…</div>
+      <div id="content" style="display: none;">
+        <div class="shop-header">
+          <div class="pill" id="shop-category"></div>
+          <h2 id="shop-name"></h2>
+          <div class="meta" id="shop-location"></div>
+          <div class="meta" id="shop-phone"></div>
+        </div>
+        <div class="shop-details">
+          <div class="detail">
+            <h4>地址</h4>
+            <p id="shop-address"></p>
+          </div>
+          <div class="detail">
+            <h4>優惠內容</h4>
+            <p id="shop-offer"></p>
+          </div>
+        </div>
+        <div class="actions" style="margin-top: 16px;">
+          <a class="button" href="./index.html">← 回商店清單</a>
+        </div>
+      </div>
+    </main>
+    <script type="module">
+      import { findShop, loadShops } from "./scripts/data-loader.js";
+
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      const statusEl = document.getElementById("status");
+      const contentEl = document.getElementById("content");
+
+      function renderShop(shop) {
+        document.getElementById("shop-title").textContent = `#${shop.id} ${shop.name}`;
+        document.getElementById("shop-name").textContent = `${shop.id}. ${shop.name}`;
+        document.getElementById("shop-category").textContent = shop.category;
+        document.getElementById("shop-location").textContent = `📍 ${shop.county} ${shop.district}`;
+        document.getElementById("shop-phone").textContent = `📞 ${shop.phone || "—"}`;
+        document.getElementById("shop-address").textContent = [shop.county, shop.district, shop.address]
+          .filter(Boolean)
+          .join(" ");
+        document.getElementById("shop-offer").textContent = shop.offer || "—";
+      }
+
+      loadShops((message) => {
+        statusEl.innerHTML = `<strong>${message}</strong>`;
+      })
+        .then((shops) => {
+          const shop = findShop(shops, id);
+          if (!shop) {
+            statusEl.innerHTML = "找不到指定的店家，請回到列表重試。";
+            return;
+          }
+          statusEl.style.display = "none";
+          renderShop(shop);
+          contentEl.style.display = "block";
+        })
+        .catch((error) => {
+          console.error(error);
+          statusEl.innerHTML = "載入失敗，請重新整理或確認 GitHub Pages 網址是否有 PDF。";
+        });
+    </script>
+  </body>
+</html>

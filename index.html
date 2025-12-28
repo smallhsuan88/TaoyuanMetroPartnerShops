@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>桃園捷運特約商店清單</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>桃園捷運特約商店清單</h1>
+      <p>自動從 PDF 解析的最新店家，點擊即可開啟專屬頁面。</p>
+    </header>
+    <main>
+      <div class="toolbar">
+        <input id="search" class="input" type="search" placeholder="搜尋店名、區域或優惠關鍵字…" />
+        <div id="status" class="status">正在載入資料…</div>
+      </div>
+      <div id="cards" class="card-grid"></div>
+      <div id="empty" class="empty" style="display: none;">沒有符合條件的特約商店。</div>
+    </main>
+    <script type="module">
+      import { loadShops } from "./scripts/data-loader.js";
+
+      const statusEl = document.getElementById("status");
+      const cardsEl = document.getElementById("cards");
+      const emptyEl = document.getElementById("empty");
+      const searchEl = document.getElementById("search");
+
+      function renderShops(shops) {
+        cardsEl.innerHTML = "";
+        if (!shops.length) {
+          emptyEl.style.display = "block";
+          return;
+        }
+        emptyEl.style.display = "none";
+
+        shops.forEach((shop) => {
+          const card = document.createElement("article");
+          card.className = "card";
+
+          const name = document.createElement("h3");
+          name.textContent = `${shop.id}. ${shop.name}`;
+
+          const pill = document.createElement("span");
+          pill.className = "pill";
+          pill.textContent = shop.category;
+
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.innerHTML = `
+            <div>📍 ${[shop.county, shop.district, shop.address].filter(Boolean).join(" ")}</div>
+            <div>📞 ${shop.phone || "—"}</div>
+          `;
+
+          const actions = document.createElement("div");
+          actions.className = "actions";
+          const link = document.createElement("a");
+          link.className = "button primary";
+          link.href = \`./shop.html?id=\${shop.id}\`;
+          link.textContent = "查看優惠";
+          actions.appendChild(link);
+
+          card.appendChild(name);
+          card.appendChild(pill);
+          card.appendChild(meta);
+          if (shop.offer) {
+            const offer = document.createElement("div");
+            offer.className = "meta";
+            offer.textContent = shop.offer.slice(0, 110) + (shop.offer.length > 110 ? "…" : "");
+            card.appendChild(offer);
+          }
+          card.appendChild(actions);
+          cardsEl.appendChild(card);
+        });
+      }
+
+      function applyFilter(shops, keyword) {
+        const normalized = keyword.trim();
+        if (!normalized) return shops;
+        const lower = normalized.toLowerCase();
+        return shops.filter((shop) =>
+          [shop.name, shop.category, shop.county, shop.district, shop.address, shop.offer]
+            .filter(Boolean)
+            .some((field) => field.toLowerCase().includes(lower))
+        );
+      }
+
+      let allShops = [];
+      loadShops((message) => {
+        statusEl.innerHTML = `<strong>${message}</strong>`;
+      })
+        .then((shops) => {
+          allShops = shops;
+          statusEl.style.display = "none";
+          renderShops(allShops);
+        })
+        .catch((error) => {
+          console.error(error);
+          statusEl.innerHTML = "載入失敗，請重新整理或確認 GitHub Pages 網址是否有 PDF。";
+        });
+
+      searchEl.addEventListener("input", (event) => {
+        renderShops(applyFilter(allShops, event.target.value));
+      });
+    </script>
+  </body>
+</html>
