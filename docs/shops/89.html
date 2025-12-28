@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>美德糕餅鋪 | 桃園捷運特約商店</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <main class="container">
@@ -25,5 +25,43 @@
     </article>
     
   </main>
+  <script>
+  const grid = document.getElementById('shop-grid');
+  const searchInput = document.getElementById('search');
+  const citySelect = document.getElementById('city');
+  const categorySelect = document.getElementById('category');
+  const countEl = document.getElementById('shop-count');
+
+  function matchesFilters(card) {
+    const text = (card.dataset.name + card.dataset.offers + card.dataset.city + (card.querySelector('.address')?.textContent || '')).toLowerCase();
+    const keyword = (searchInput?.value || '').toLowerCase();
+    const city = citySelect?.value || '';
+    const category = categorySelect?.value || '';
+    const cityOk = !city || card.dataset.city === city;
+    const categoryOk = !category || card.dataset.category === category;
+    const keywordOk = !keyword || text.includes(keyword);
+    return cityOk && categoryOk && keywordOk;
+  }
+
+  function filterCards() {
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll('.shop-card'));
+    let visible = 0;
+    cards.forEach(card => {
+      if (matchesFilters(card)) {
+        card.hidden = false;
+        visible += 1;
+      } else {
+        card.hidden = true;
+      }
+    });
+    if (countEl) countEl.textContent = visible.toString();
+  }
+
+  [searchInput, citySelect, categorySelect].forEach(el => {
+    if (el) el.addEventListener('input', filterCards);
+    if (el) el.addEventListener('change', filterCards);
+  });
+  </script>
 </body>
 </html>
