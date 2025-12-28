@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>桃園捷運特約商店地圖 | GitHub Pages</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Taoyuan Metro Partner Shops</p>
+      <h1>桃園捷運特約商店網站</h1>
+      <p class="lede">瀏覽 287 家特約商店，查看各店優惠、地址與聯絡方式。每間店家都有專屬的靜態頁面，直接部署在 GitHub Pages。</p>
+      <div class="actions">
+        <a class="button" href="#shops">開始瀏覽</a>
+        <a class="button ghost" href="data/shops.json">下載 JSON 資料</a>
+      </div>
+    </div>
+    <div class="hero-card card">
+      <p>搜尋 & 篩選</p>
+      <ul>
+        <li>以店名、地址或優惠關鍵字即時搜尋</li>
+        <li>依分類與縣市篩選，快速定位</li>
+        <li>每間店都有專屬連結，可直接分享</li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="shops" class="content">
+    <section class="filters card">
+      <div class="input-group">
+        <label for="search">搜尋</label>
+        <input id="search" type="search" placeholder="輸入店名、地址或優惠關鍵字">
+      </div>
+      <div class="filter-grid">
+        <div class="input-group">
+          <label for="category">分類</label>
+          <select id="category"></select>
+        </div>
+        <div class="input-group">
+          <label for="city">縣市</label>
+          <select id="city"></select>
+        </div>
+      </div>
+    </section>
+
+    <section id="shop-list" class="grid"></section>
+    <div id="empty-state" class="card empty hidden">找不到符合條件的商店，請調整搜尋或篩選條件。</div>
+  </main>
+
+  <footer class="site-footer">
+    <p>資料來源：桃園市政府員工卡特約商店名單（2024/12/17 更新）。</p>
+    <p>此網站為靜態 GitHub Pages，所有內容來自倉庫內的 PDF 與 JSON。</p>
+  </footer>
+
+  <script src="assets/main.js" type="module"></script>
+</body>
+</html>
