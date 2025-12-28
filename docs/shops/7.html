@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>中國青年救國團運動健康產業處委託經營之運動中心及國民運動中心臺北市中山運動中心臺北市南港運動中心臺北市文山運動中心暨景美游泳池臺北市內湖運動中心新北市汐止國民運動中心新北市永和國民運動中心新北市林口國民運動中心桃園市桃園國民運動中心桃園市中壢國民運動中心桃園市八德國民運動中心新竹市竹光國民運動中心臺中市朝馬國民運動中心彰化縣阿斯貝克運動中心#365 | 桃園捷運特約商店</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <main class="container">
@@ -25,5 +25,43 @@
     </article>
     
   </main>
+  <script>
+  const grid = document.getElementById('shop-grid');
+  const searchInput = document.getElementById('search');
+  const citySelect = document.getElementById('city');
+  const categorySelect = document.getElementById('category');
+  const countEl = document.getElementById('shop-count');
+
+  function matchesFilters(card) {
+    const text = (card.dataset.name + card.dataset.offers + card.dataset.city + (card.querySelector('.address')?.textContent || '')).toLowerCase();
+    const keyword = (searchInput?.value || '').toLowerCase();
+    const city = citySelect?.value || '';
+    const category = categorySelect?.value || '';
+    const cityOk = !city || card.dataset.city === city;
+    const categoryOk = !category || card.dataset.category === category;
+    const keywordOk = !keyword || text.includes(keyword);
+    return cityOk && categoryOk && keywordOk;
+  }
+
+  function filterCards() {
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll('.shop-card'));
+    let visible = 0;
+    cards.forEach(card => {
+      if (matchesFilters(card)) {
+        card.hidden = false;
+        visible += 1;
+      } else {
+        card.hidden = true;
+      }
+    });
+    if (countEl) countEl.textContent = visible.toString();
+  }
+
+  [searchInput, citySelect, categorySelect].forEach(el => {
+    if (el) el.addEventListener('input', filterCards);
+    if (el) el.addEventListener('change', filterCards);
+  });
+  </script>
 </body>
 </html>
